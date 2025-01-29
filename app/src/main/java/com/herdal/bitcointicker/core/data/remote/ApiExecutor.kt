@@ -4,26 +4,26 @@ import okio.IOException
 import retrofit2.Response
 
 abstract class ApiExecutor(private val networkHelper: NetworkHelper) {
-    suspend fun <T> executeApiCall(apiCall: suspend () -> Response<T>): Result<T> {
+    suspend fun <T> executeApiCall(apiCall: suspend () -> Response<T>): ApiResult<T> {
         return try {
             if (!networkHelper.isConnected()) {
-                return Result.Error(NetworkException.NoInternet)
+                return ApiResult.Error(NetworkException.NoInternet)
             }
 
             val response = apiCall()
 
             if (response.isSuccessful) {
                 response.body()?.let {
-                    Result.Success(it)
-                } ?: Result.Error(NetworkException.UnknownError("Response body is null"))
+                    ApiResult.Success(it)
+                } ?: ApiResult.Error(NetworkException.UnknownError("Response body is null"))
             } else {
-                Result.Error(NetworkException.HttpError(response.code(), response.message()))
+                ApiResult.Error(NetworkException.HttpError(response.code(), response.message()))
             }
 
         } catch (e: IOException) {
-            Result.Error(NetworkException.NetworkError(e.localizedMessage ?: "Network error"))
+            ApiResult.Error(NetworkException.NetworkError(e.localizedMessage ?: "Network error"))
         } catch (e: Exception) {
-            Result.Error(NetworkException.UnknownError(e.localizedMessage ?: "Unknown error"))
+            ApiResult.Error(NetworkException.UnknownError(e.localizedMessage ?: "Unknown error"))
         }
     }
 }

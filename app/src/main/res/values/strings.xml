@@ -12,4 +12,10 @@
 
     <!-- My Coins -->
     <string name="my_coins">My Coins</string>
+
+    <!-- Error -->
+    <string name="error_dialog_title">Error</string>
+    <string name="error_dialog_retry">Retry</string>
+    <string name="error_dialog_dismiss">Dismiss</string>
+
 </resources>
