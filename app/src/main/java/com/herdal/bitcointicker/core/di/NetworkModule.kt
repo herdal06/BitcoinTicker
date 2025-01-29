@@ -1,9 +1,13 @@
 package com.herdal.bitcointicker.core.di
 
+import android.content.Context
 import com.herdal.bitcointicker.BuildConfig
+import com.herdal.bitcointicker.core.data.remote.NetworkHelper
+import com.herdal.bitcointicker.core.data.remote.NetworkHelperImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -48,5 +52,11 @@ object NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkHelper(@ApplicationContext context: Context): NetworkHelper {
+        return NetworkHelperImpl(context)
     }
 }
