@@ -3,8 +3,8 @@ package com.herdal.bitcointicker.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +18,7 @@ import com.herdal.bitcointicker.R
 fun AppBottomNavBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    NavigationBar {
+    BottomAppBar  {
         NavigationBarItem(
             selected = currentRoute == BottomNavItem.Home.route.toString(),
             onClick = {
