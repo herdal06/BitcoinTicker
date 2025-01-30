@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.herdal.bitcointicker.features.authentication.presentation.AuthenticationScreen
 import com.herdal.bitcointicker.features.coin.presentation.coindetail.CoinDetailScreen
 import com.herdal.bitcointicker.features.coin.presentation.mycoins.MyCoinsScreen
@@ -24,18 +25,19 @@ fun SetupNavGraph(
             })
         }
         composable(Screen.Home.toString()) {
-            HomeScreen(onClickCoin = { id ->
-                navController.navigate(Screen.CoinDetail(id = id).toString())
+            HomeScreen(onClickCoin = {
+                navController.navigate(Screen.CoinDetail(it))
             })
         }
         composable(Screen.MyCoins.toString()) {
-            MyCoinsScreen(onClickCoin = { id ->
-                navController.navigate(Screen.CoinDetail(id = id).toString())
+            MyCoinsScreen(onClickCoin = {
+                navController.navigate(Screen.CoinDetail(it))
             })
         }
 
         composable(Screen.CoinDetail.toString()) {
-            CoinDetailScreen()
+            val args = it.toRoute<Screen.CoinDetail>()
+            CoinDetailScreen(id = args.id)
         }
     }
 }

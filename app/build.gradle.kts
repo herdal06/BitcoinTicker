@@ -91,8 +91,6 @@ dependencies {
     ksp(libs.dagger.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // Coil
-    implementation(libs.coil.compose)
 
     implementation(libs.okhttp3.integration)
     ksp(libs.compiler)
@@ -108,4 +106,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    // Glide
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }

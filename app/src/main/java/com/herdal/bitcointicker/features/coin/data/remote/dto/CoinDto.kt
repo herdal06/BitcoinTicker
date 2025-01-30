@@ -1,51 +1,82 @@
 package com.herdal.bitcointicker.features.coin.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
+import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinUiModel
 
 data class CoinDto(
     val ath: Double?,
     @SerializedName("ath_change_percentage")
-    val ath_change_percentage: Double?,
+    val athChangePercentage: Double?,
     @SerializedName("ath_date")
-    val ath_date: String?,
+    val athDate: String?,
     val atl: Double?,
     @SerializedName("atl_change_percentage")
-    val atl_change_percentage: Double?,
+    val atlChangePercentage: Double?,
     @SerializedName("atl_date")
-    val atl_date: String?,
+    val atlDate: String?,
     @SerializedName("circulating_supply")
-    val circulating_supply: Double?,
+    val circulatingSupply: Double?,
     @SerializedName("current_price")
-    val current_price: Double?,
+    val currentPrice: Double?,
     @SerializedName("fully_diluted_valuation")
-    val fully_diluted_valuation: Long?,
+    val fullyDilutedValuation: Long?,
     @SerializedName("high_24h")
-    val high_24h: Double?,
+    val high24h: Double?,
     val id: String?,
     val image: String?,
     @SerializedName("last_updated")
-    val last_updated: String?,
+    val lastUpdated: String?,
     @SerializedName("low_24h")
-    val low_24h: Double?,
+    val low24h: Double?,
     @SerializedName("market_cap")
-    val market_cap: Long?,
+    val marketCap: Long?,
     @SerializedName("market_cap_change_24h")
-    val market_cap_change_24h: Double?,
+    val marketCapChange24h: Double?,
     @SerializedName("market_cap_change_percentage_24h")
-    val market_cap_change_percentage_24h: Double?,
+    val marketCapChangePercentage24h: Double?,
     @SerializedName("market_cap_rank")
-    val market_cap_rank: Int?,
+    val marketCapRank: Int?,
     @SerializedName("max_supply")
-    val max_supply: Double?,
+    val maxSupply: Double?,
     val name: String?,
     @SerializedName("price_change_24h")
-    val price_change_24h: Double?,
+    val priceChange24h: Double?,
     @SerializedName("price_change_percentage_24h")
-    val price_change_percentage_24h: Double?,
+    val priceChangePercentage24h: Double?,
     val roi: RoiDto?,
     val symbol: String?,
     @SerializedName("total_supply")
-    val total_supply: Double?,
+    val totalSupply: Double?,
     @SerializedName("total_volume")
-    val total_volume: Long?
+    val totalVolume: Long?
 )
+
+fun CoinDto.toDomain(): CoinUiModel =
+    CoinUiModel(
+        id = id.orEmpty(),
+        name = name.orEmpty(),
+        symbol = symbol.orEmpty(),
+        image = image.orEmpty(),
+        currentPrice = currentPrice ?: 0.0,
+        marketCap = marketCap ?: 0L,
+        marketCapRank = marketCapRank ?: 0,
+        totalVolume = totalVolume ?: 0L,
+        high24h = high24h ?: 0.0,
+        low24h = low24h ?: 0.0,
+        priceChange24h = priceChange24h ?: 0.0,
+        priceChangePercentage24h = priceChangePercentage24h ?: 0.0,
+        marketCapChange24h = marketCapChange24h ?: 0.0,
+        marketCapChangePercentage24h = marketCapChangePercentage24h ?: 0.0,
+        circulatingSupply = circulatingSupply ?: 0.0,
+        totalSupply = totalSupply,
+        maxSupply = maxSupply,
+        ath = ath ?: 0.0,
+        athChangePercentage = athChangePercentage ?: 0.0,
+        athDate = athDate.orEmpty(),
+        atl = atl ?: 0.0,
+        atlChangePercentage = atlChangePercentage ?: 0.0,
+        atlDate = atlDate.orEmpty(),
+        lastUpdated = lastUpdated.orEmpty(),
+        roi = roi?.toDomain(),
+        fullyDilutedValuation = fullyDilutedValuation
+    )

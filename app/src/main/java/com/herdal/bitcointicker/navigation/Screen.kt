@@ -14,5 +14,5 @@ sealed class Screen {
     data object MyCoins : Screen()
 
     @Serializable
-    data class CoinDetail(val id: String) : Screen()
+    data class CoinDetail(val id: String?) : Screen()
 }
