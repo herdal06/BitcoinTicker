@@ -1,10 +1,9 @@
 package com.herdal.bitcointicker.features.coin.data.repository
 
-import com.herdal.bitcointicker.core.data.local.DatabaseResult
+import com.herdal.bitcointicker.core.data.remote.Error
+import com.herdal.bitcointicker.core.data.remote.IResult
 import com.herdal.bitcointicker.features.coin.data.local.datasource.CoinLocalDataSource
 import com.herdal.bitcointicker.features.coin.data.remote.datasource.CoinRemoteDataSource
-import com.herdal.bitcointicker.core.data.remote.ApiResult
-import com.herdal.bitcointicker.core.data.remote.NetworkException
 import com.herdal.bitcointicker.features.coin.data.remote.dto.toDomain
 import com.herdal.bitcointicker.features.coin.domain.CoinRepository
 import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinDetailUiModel
@@ -16,9 +15,9 @@ class CoinRepositoryImpl @Inject constructor(
     private val coinRemoteDataSource: CoinRemoteDataSource,
     private val coinLocalDataSource: CoinLocalDataSource
 ) : CoinRepository {
-    override suspend fun getCoins(currency: String): ApiResult<List<CoinUiModel>> {
+    override suspend fun getCoins(currency: String): IResult<List<CoinUiModel>> {
         return when (val remoteResult = coinRemoteDataSource.getCoins(currency)) {
-            is ApiResult.Success -> {
+            is IResult.Success -> {
                 val coins = remoteResult.data.map { it.toDomain() }
 
                 val insertResult = coinLocalDataSource.insertCoins(
@@ -26,29 +25,29 @@ class CoinRepositoryImpl @Inject constructor(
                 )
 
                 when (insertResult) {
-                    is DatabaseResult.Success -> ApiResult.Success(coins)
-                    is DatabaseResult.Error -> ApiResult.Error(
-                        NetworkException.UnknownError(
-                            insertResult.exception.message.orEmpty()
+                    is IResult.Success -> IResult.Success(coins)
+                    is IResult.Failure -> IResult.Failure(
+                        Error.RoomDatabaseError.QueryError(
+                            insertResult.error.toString()
                         )
                     )
                 }
             }
 
-            is ApiResult.Error -> {
-                ApiResult.Error(remoteResult.error)
+            is IResult.Failure -> {
+                IResult.Failure(remoteResult.error)
             }
         }
     }
 
-    override suspend fun getCoinDetail(id: String): ApiResult<CoinDetailUiModel> {
+    override suspend fun getCoinDetail(id: String): IResult<CoinDetailUiModel> {
         return when (val result = coinRemoteDataSource.getCoinDetail(id)) {
-            is ApiResult.Success -> {
-                ApiResult.Success(result.data.toDomain())
+            is IResult.Success -> {
+                IResult.Success(result.data.toDomain())
             }
 
-            is ApiResult.Error -> {
-                ApiResult.Error(result.error)
+            is IResult.Failure -> {
+                IResult.Failure(result.error)
             }
         }
     }
