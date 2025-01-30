@@ -13,29 +13,29 @@ import com.herdal.bitcointicker.features.home.presentation.HomeScreen
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    startDestination: Screen = Screen.Authentication
+    startDestination: Screen = Screen.Home
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination.toString()
+        startDestination = startDestination
     ) {
-        composable(Screen.Authentication.toString()) {
+        composable<Screen.Authentication> {
             AuthenticationScreen(onAuthSuccess = {
-                navController.navigate(Screen.Home.toString())
+                navController.navigate(Screen.Home)
             })
         }
-        composable(Screen.Home.toString()) {
+        composable<Screen.Home> {
             HomeScreen(onClickCoin = {
                 navController.navigate(Screen.CoinDetail(it))
             })
         }
-        composable(Screen.MyCoins.toString()) {
+        composable<Screen.MyCoins> {
             MyCoinsScreen(onClickCoin = {
                 navController.navigate(Screen.CoinDetail(it))
             })
         }
 
-        composable(Screen.CoinDetail.toString()) {
+        composable<Screen.CoinDetail> {
             val args = it.toRoute<Screen.CoinDetail>()
             CoinDetailScreen(id = args.id)
         }

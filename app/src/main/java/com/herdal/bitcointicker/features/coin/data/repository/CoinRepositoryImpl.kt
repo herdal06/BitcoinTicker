@@ -7,6 +7,7 @@ import com.herdal.bitcointicker.core.data.remote.ApiResult
 import com.herdal.bitcointicker.core.data.remote.NetworkException
 import com.herdal.bitcointicker.features.coin.data.remote.dto.toDomain
 import com.herdal.bitcointicker.features.coin.domain.CoinRepository
+import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinDetailUiModel
 import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinUiModel
 import com.herdal.bitcointicker.features.coin.domain.uimodel.toEntity
 import javax.inject.Inject
@@ -36,6 +37,18 @@ class CoinRepositoryImpl @Inject constructor(
 
             is ApiResult.Error -> {
                 ApiResult.Error(remoteResult.error)
+            }
+        }
+    }
+
+    override suspend fun getCoinDetail(id: String): ApiResult<CoinDetailUiModel> {
+        return when (val result = coinRemoteDataSource.getCoinDetail(id)) {
+            is ApiResult.Success -> {
+                ApiResult.Success(result.data.toDomain())
+            }
+
+            is ApiResult.Error -> {
+                ApiResult.Error(result.error)
             }
         }
     }
