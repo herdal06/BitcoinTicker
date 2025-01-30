@@ -3,10 +3,7 @@ package com.herdal.bitcointicker.features.authentication.presentation.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +20,7 @@ import com.herdal.bitcointicker.R
 @Composable
 fun LoginTab(
     modifier: Modifier = Modifier,
-    onLoginClick: (String, String) -> Unit,
-    isLoading: Boolean
+    onLoginClick: (String, String) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -50,17 +46,9 @@ fun LoginTab(
 
         Button(
             onClick = { onLoginClick(email, password) },
-            enabled = !isLoading,
             modifier = modifier.fillMaxWidth()
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = modifier.size(24.dp)
-                )
-            } else {
-                Text(stringResource(R.string.login))
-            }
+            Text(stringResource(R.string.login))
         }
     }
 }
