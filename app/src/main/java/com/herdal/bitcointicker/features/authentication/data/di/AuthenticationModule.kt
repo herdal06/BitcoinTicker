@@ -6,10 +6,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.herdal.bitcointicker.core.di.IoDispatcher
-import com.herdal.bitcointicker.features.authentication.data.remote.datasource.AuthenticationDataSource
-import com.herdal.bitcointicker.features.authentication.data.remote.datasource.AuthenticationDataSourceImpl
+import com.herdal.bitcointicker.features.authentication.data.firebase.datasource.AuthenticationDataSource
+import com.herdal.bitcointicker.features.authentication.data.firebase.datasource.AuthenticationDataSourceImpl
 import com.herdal.bitcointicker.features.authentication.data.repository.AuthenticationRepositoryImpl
 import com.herdal.bitcointicker.features.authentication.domain.AuthenticationRepository
+import com.herdal.bitcointicker.features.user.data.firebase.datasource.UserFirebaseDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,8 +44,13 @@ object AuthenticationModule {
     @Singleton
     fun provideAuthenticationRepository(
         authenticationDataSource: AuthenticationDataSource,
+        userFirebaseDataSource: UserFirebaseDataSource,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): AuthenticationRepository {
-        return AuthenticationRepositoryImpl(authenticationDataSource, ioDispatcher)
+        return AuthenticationRepositoryImpl(
+            authenticationDataSource,
+            userFirebaseDataSource,
+            ioDispatcher
+        )
     }
 }

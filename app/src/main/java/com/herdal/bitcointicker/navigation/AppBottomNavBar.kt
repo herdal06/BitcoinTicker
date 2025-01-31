@@ -1,8 +1,5 @@
 package com.herdal.bitcointicker.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItem
@@ -18,21 +15,22 @@ import com.herdal.bitcointicker.R
 fun AppBottomNavBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    BottomAppBar  {
+
+    BottomAppBar {
         NavigationBarItem(
-            selected = currentRoute == BottomNavItem.Home.route.toString(),
+            selected = currentRoute == BottomNavItem.Home.screen.route,
             onClick = {
-                navController.navigate(Screen.Home.toString())
+                navController.navigate(BottomNavItem.Home.screen.route)
             },
-            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(R.string.home)) },
+            icon = { Icon(BottomNavItem.Home.icon, contentDescription = stringResource(R.string.home)) },
             label = { Text(text = stringResource(R.string.home)) }
         )
         NavigationBarItem(
-            selected = currentRoute == BottomNavItem.MyCoins.route.toString(),
-            onClick = { navController.navigate(Screen.MyCoins.toString()) },
+            selected = currentRoute == BottomNavItem.MyCoins.screen.route,
+            onClick = { navController.navigate(BottomNavItem.MyCoins.screen.route) },
             icon = {
                 Icon(
-                    Icons.Default.Favorite,
+                    BottomNavItem.MyCoins.icon,
                     contentDescription = stringResource(R.string.my_coins)
                 )
             },

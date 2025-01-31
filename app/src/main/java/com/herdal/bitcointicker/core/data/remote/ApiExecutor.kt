@@ -2,14 +2,11 @@ package com.herdal.bitcointicker.core.data.remote
 
 import okio.IOException
 import retrofit2.Response
+import java.net.UnknownHostException
 
-abstract class ApiExecutor(private val networkHelper: NetworkHelper) {
+interface ApiExecutor {
     suspend fun <T> executeApiCall(apiCall: suspend () -> Response<T>): IResult<T> {
         return try {
-            if (!networkHelper.isConnected()) {
-                return IResult.Failure(Error.NetworkError.NetworkUnavailable("No internet connection"))
-            }
-
             val response = apiCall()
 
             if (response.isSuccessful) {
@@ -21,7 +18,17 @@ abstract class ApiExecutor(private val networkHelper: NetworkHelper) {
             }
 
         } catch (e: IOException) {
-            IResult.Failure(Error.NetworkError.NetworkUnavailable(e.localizedMessage ?: "Network error"))
+            IResult.Failure(
+                Error.NetworkError.NetworkUnavailable(
+                    e.localizedMessage ?: "Network error"
+                )
+            )
+        } catch (e: UnknownHostException) {
+            IResult.Failure(
+                Error.NetworkError.NetworkUnavailable(
+                    e.localizedMessage ?: "Network error"
+                )
+            )
         } catch (e: Exception) {
             IResult.Failure(Error.NetworkError.UnknownError(e.localizedMessage ?: "Unknown error"))
         }

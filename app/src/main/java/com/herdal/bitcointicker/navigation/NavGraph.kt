@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.herdal.bitcointicker.features.authentication.presentation.AuthenticationScreen
 import com.herdal.bitcointicker.features.coin.presentation.coindetail.CoinDetailScreen
 import com.herdal.bitcointicker.features.coin.presentation.mycoins.MyCoinsScreen
@@ -13,33 +12,35 @@ import com.herdal.bitcointicker.features.home.presentation.HomeScreen
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    startDestination: Screen = Screen.Home
+    startDestination: Screen = Screen.Authentication
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination.route
     ) {
-        composable<Screen.Authentication> {
+        composable(Screen.Authentication.route) {
             AuthenticationScreen(onSuccess = {
-                navController.navigate(Screen.Home) {
-                    popUpTo(Screen.Authentication) { inclusive = true }
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Authentication.route) { inclusive = true }
                 }
             })
         }
-        composable<Screen.Home> {
+
+        composable(Screen.Home.route) {
             HomeScreen(onClickCoin = {
-                navController.navigate(Screen.CoinDetail(it))
-            })
-        }
-        composable<Screen.MyCoins> {
-            MyCoinsScreen(onClickCoin = {
-                navController.navigate(Screen.CoinDetail(it))
+                navController.navigate(Screen.CoinDetail.createRoute(it.toString()))
             })
         }
 
-        composable<Screen.CoinDetail> {
-            val args = it.toRoute<Screen.CoinDetail>()
-            CoinDetailScreen(id = args.id)
+        composable(Screen.MyCoins.route) {
+            MyCoinsScreen(onClickCoin = {
+                navController.navigate(Screen.CoinDetail.createRoute(it.toString()))
+            })
+        }
+
+        composable(Screen.CoinDetail.route) { backStackEntry ->
+            val args = backStackEntry.arguments?.getString("id")
+            CoinDetailScreen(id = args ?: "")
         }
     }
 }

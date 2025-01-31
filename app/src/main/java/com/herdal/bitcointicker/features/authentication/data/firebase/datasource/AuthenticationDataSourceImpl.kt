@@ -1,4 +1,4 @@
-package com.herdal.bitcointicker.features.authentication.data.remote.datasource
+package com.herdal.bitcointicker.features.authentication.data.firebase.datasource
 
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -65,5 +65,27 @@ class AuthenticationDataSourceImpl @Inject constructor(
         } catch (e: Exception) {
             IResult.Failure(Error.AuthError.UnknownAuthError(e.localizedMessage ?: "Unknown error"))
         }
+    }
+
+    override suspend fun getCurrentUser(): IResult<FirebaseUser> {
+        val currentUser = firebaseAuth.currentUser
+        return if (currentUser != null) {
+            IResult.Success(currentUser)
+        } else {
+            IResult.Failure(Error.AuthError.UserNotFound("User is not logged in"))
+        }
+    }
+
+    override suspend fun signOut(): IResult<Unit> = try {
+        firebaseAuth.signOut()
+        IResult.Success(Unit)
+    } catch (e: Exception) {
+        IResult.Failure(Error.FirestoreError.AuthError(e.message.orEmpty()))
+    }
+
+    override suspend fun isUserLoggedIn(): IResult<Boolean> = try {
+        IResult.Success(firebaseAuth.currentUser != null)
+    } catch (e: Exception) {
+        IResult.Failure(Error.FirestoreError.AuthError(e.message.orEmpty()))
     }
 }

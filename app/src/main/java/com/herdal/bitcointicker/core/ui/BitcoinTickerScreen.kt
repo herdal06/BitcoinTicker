@@ -9,7 +9,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.herdal.bitcointicker.core.ui.components.TopAppBar
 import com.herdal.bitcointicker.navigation.AppBottomNavBar
+import com.herdal.bitcointicker.navigation.Screen
 import com.herdal.bitcointicker.navigation.SetupNavGraph
 
 @Composable
@@ -21,6 +23,13 @@ fun BitcoinTickerScreen(
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding(),
+        topBar = {
+            TopAppBar(onSignOut = {
+                navController.navigate(Screen.Authentication) {
+                    popUpTo(Screen.Home) { inclusive = true }
+                }
+            })
+        },
         bottomBar = {
             AppBottomNavBar(navController)
         }
