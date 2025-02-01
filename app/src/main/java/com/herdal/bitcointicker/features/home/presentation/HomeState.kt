@@ -5,5 +5,5 @@ import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinUiModel
 
 data class HomeState(
     val coins: UiState<List<CoinUiModel>> = UiState.Loading,
-    val searchResults: UiState<List<CoinUiModel>> = UiState.Success(emptyList())
+    val noCoinsFound: Boolean = false
 )

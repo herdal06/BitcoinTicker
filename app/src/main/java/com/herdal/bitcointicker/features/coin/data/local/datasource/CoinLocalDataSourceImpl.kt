@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import com.herdal.bitcointicker.core.di.IoDispatcher
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CoinLocalDataSourceImpl @Inject constructor(
@@ -33,9 +36,11 @@ class CoinLocalDataSourceImpl @Inject constructor(
 
     override fun searchCoins(query: String): Flow<IResult<List<CoinEntity>>> = flow {
         try {
-            coinDao.searchCoins("%$query%").collect { result ->
-                emit(IResult.Success(result))
-            }
+            emitAll(
+                coinDao.searchCoins("%$query%").map { result ->
+                    IResult.Success(result)
+                }
+            )
         } catch (e: Exception) {
             emit(
                 IResult.Failure(
@@ -45,5 +50,5 @@ class CoinLocalDataSourceImpl @Inject constructor(
                 )
             )
         }
-    }
+    }.flowOn(ioDispatcher) // Flow'u IO thread'de çalıştır
 }

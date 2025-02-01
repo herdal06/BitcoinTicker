@@ -28,7 +28,7 @@ class MyCoinsViewModel @Inject constructor(
         getFavorites()
     }
 
-    fun getFavorites() {
+    private fun getFavorites() {
         viewModelScope.launch {
             getFavoriteCoinsUseCase.execute()
                 .collect { uiState ->
