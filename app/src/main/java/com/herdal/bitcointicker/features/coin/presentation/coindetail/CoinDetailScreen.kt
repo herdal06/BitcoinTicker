@@ -31,7 +31,7 @@ fun CoinDetailScreen(
         }
 
         is UiState.Error -> {
-            ErrorDialog(message = coinState.message, onDismiss = {})
+            ErrorDialog(message = coinState.message)
         }
     }
 }

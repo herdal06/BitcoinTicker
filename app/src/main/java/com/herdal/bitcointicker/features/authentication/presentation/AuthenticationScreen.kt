@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -42,7 +41,6 @@ fun AuthenticationScreen(
 ) {
     var tabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.login), stringResource(R.string.signup))
-    var isDialogVisible by remember { mutableStateOf(false) }
     val authState by viewModel.authState.collectAsStateWithLifecycle()
 
     Column(
@@ -120,8 +118,7 @@ fun AuthenticationScreen(
             }
 
             is UiState.Error -> ErrorDialog(
-                message = loginState.message,
-                onDismiss = { isDialogVisible = false }
+                message = loginState.message
             )
         }
 
@@ -132,8 +129,7 @@ fun AuthenticationScreen(
             }
 
             is UiState.Error -> ErrorDialog(
-                message = registerState.message,
-                onDismiss = { isDialogVisible = false }
+                message = registerState.message
             )
         }
     }

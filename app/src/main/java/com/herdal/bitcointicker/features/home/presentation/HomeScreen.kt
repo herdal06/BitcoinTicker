@@ -78,7 +78,7 @@ fun HomeScreen(
             }
 
             is UiState.Error -> {
-                ErrorDialog(message = uiState.message, onDismiss = {})
+                ErrorDialog(message = uiState.message)
             }
         }
     }

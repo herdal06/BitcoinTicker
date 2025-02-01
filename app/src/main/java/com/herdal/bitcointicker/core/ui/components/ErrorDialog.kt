@@ -15,8 +15,7 @@ import com.herdal.bitcointicker.R
 
 @Composable
 fun ErrorDialog(
-    message: String,
-    onDismiss: () -> Unit
+    message: String
 ) {
     var isDialogVisible by remember { mutableStateOf(true) }
 
@@ -24,7 +23,6 @@ fun ErrorDialog(
         AlertDialog(
             onDismissRequest = {
                 isDialogVisible = false
-                onDismiss()
             },
             title = {
                 Text(
@@ -42,7 +40,6 @@ fun ErrorDialog(
                 Button(
                     onClick = {
                         isDialogVisible = false
-                        onDismiss()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
