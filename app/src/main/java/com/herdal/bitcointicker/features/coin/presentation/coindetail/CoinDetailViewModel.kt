@@ -23,7 +23,6 @@ class CoinDetailViewModel @Inject constructor(
     private val deleteCoinFromFavoritesUseCase: DeleteCoinFromFavoritesUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(CoinDetailState())
     val state = _state.asStateFlow()
 
@@ -50,31 +49,37 @@ class CoinDetailViewModel @Inject constructor(
 
             viewModelScope.launch {
                 if (coin.isFavorite) {
-                    favoriteCoin.id?.let {
-                        deleteCoinFromFavoritesUseCase.execute(it)
-                            .collect {
-                                _state.update {
-                                    it.copy(
-                                        coin = currentState.copy(
-                                            data = coin.copy(
-                                                isFavorite = false
+                    favoriteCoin.id?.let { id ->
+                        deleteCoinFromFavoritesUseCase.execute(id)
+                            .collect { result ->
+                                when (result) {
+                                    is UiState.Success -> {
+                                        _state.update {
+                                            it.copy(
+                                                coin = UiState.Success(
+                                                    coin.copy(isFavorite = false)
+                                                )
                                             )
-                                        )
-                                    )
+                                        }
+                                    }
+                                    else -> UiState.Error("delete coin operation failed")
                                 }
                             }
                     }
                 } else {
                     addCoinToFavoritesUseCase.execute(favoriteCoin)
-                        .collect {
-                            _state.update {
-                                it.copy(
-                                    coin = currentState.copy(
-                                        data = coin.copy(
-                                            isFavorite = true
+                        .collect { result ->
+                            when (result) {
+                                is UiState.Success -> {
+                                    _state.update {
+                                        it.copy(
+                                            coin = UiState.Success(
+                                                coin.copy(isFavorite = true)
+                                            )
                                         )
-                                    )
-                                )
+                                    }
+                                }
+                                else -> UiState.Error("add coin operation failed")
                             }
                         }
                 }
@@ -82,7 +87,6 @@ class CoinDetailViewModel @Inject constructor(
         }
     }
 }
-
 
 fun CoinDetailUiModel.toFavoriteCoinUiModel(): FavoriteCoinUiModel {
     return FavoriteCoinUiModel(

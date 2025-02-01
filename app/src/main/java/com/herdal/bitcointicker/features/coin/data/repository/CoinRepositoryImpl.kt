@@ -51,14 +51,26 @@ class CoinRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCoinDetail(id: String): IResult<CoinDetailUiModel> {
-        return when (val result = coinRemoteDataSource.getCoinDetail(id)) {
+        return when (val currentUserResult = authenticationDataSource.getCurrentUser()) {
             is IResult.Success -> {
-                IResult.Success(result.data.toDomain())
+                val userId = currentUserResult.data.uid
+
+                when (val detailResult = coinRemoteDataSource.getCoinDetail(id)) {
+                    is IResult.Success -> {
+                        val isFavorite = when (val favoriteResult =
+                            coinFirebaseDataSource.isCoinFavorite(userId, id)) {
+                            is IResult.Success -> favoriteResult.data
+                            is IResult.Failure -> false
+                        }
+
+                        IResult.Success(detailResult.data.toDomain().copy(isFavorite = isFavorite))
+                    }
+
+                    is IResult.Failure -> IResult.Failure(detailResult.error)
+                }
             }
 
-            is IResult.Failure -> {
-                IResult.Failure(result.error)
-            }
+            is IResult.Failure -> IResult.Failure(currentUserResult.error)
         }
     }
 
