@@ -7,14 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.herdal.bitcointicker.R
 import com.herdal.bitcointicker.core.domain.UiState
 import com.herdal.bitcointicker.core.ui.components.ErrorDialog
 import com.herdal.bitcointicker.core.ui.components.LoadingScreen
@@ -40,8 +41,8 @@ fun HomeScreen(
             query = searchQuery,
             onQueryChange = viewModel::onSearchQueryChanged,
             clearQuery = { viewModel.onSearchQueryChanged("") },
-            searchHint = "Kripto Ara...",
-            clearContentDescription = "Aramayı Temizle",
+            searchHint = stringResource(R.string.search_hint),
+            clearContentDescription = stringResource(R.string.clear_content_description),
             modifier = Modifier.fillMaxWidth()
         )
 

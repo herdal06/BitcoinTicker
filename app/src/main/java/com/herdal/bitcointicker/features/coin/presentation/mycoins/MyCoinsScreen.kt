@@ -31,11 +31,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.herdal.bitcointicker.R
 import com.herdal.bitcointicker.core.domain.UiState
 import com.herdal.bitcointicker.core.ui.components.ErrorDialog
 import com.herdal.bitcointicker.core.ui.components.LoadingScreen
@@ -65,7 +67,9 @@ fun MyCoinsScreen(
         }
 
         is UiState.Error -> {
-            ErrorDialog(message = favoriteCoinsState.message, onDismiss = { isDialogVisible = false })
+            ErrorDialog(
+                message = favoriteCoinsState.message,
+                onDismiss = { isDialogVisible = false })
         }
     }
 }
@@ -172,14 +176,14 @@ private fun EmptyFavoritesContent() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "stringResource(R.string.no_favorites)",
+            text = stringResource(R.string.no_favorites),
             style = MaterialTheme.typography.titleLarge
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "stringResource(R.string.add_favorites_description)",
+            text = stringResource(R.string.add_favorites_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             textAlign = TextAlign.Center

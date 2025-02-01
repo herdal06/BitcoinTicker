@@ -9,13 +9,16 @@
 
     <!-- Home -->
     <string name="home">Home</string>
+    <string name="search_hint">Search Cryptocurrency…</string>
+    <string name="clear_content_description">Clear search</string>
 
     <!-- My Coins -->
     <string name="my_coins">My Coins</string>
+    <string name="no_favorites">No favorites yet</string>
+    <string name="add_favorites_description">Add your favorite cryptocurrencies here.</string>
 
     <!-- Error -->
     <string name="error_dialog_title">Error</string>
     <string name="error_dialog_retry">Retry</string>
     <string name="error_dialog_dismiss">Dismiss</string>
-
 </resources>
