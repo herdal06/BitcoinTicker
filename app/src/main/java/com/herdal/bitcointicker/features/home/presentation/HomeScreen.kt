@@ -10,6 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,6 +29,7 @@ fun HomeScreen(
     onClickCoin: (id: String?) -> Unit
 ) {
     val homeState by viewModel.homeState.collectAsStateWithLifecycle()
+    var isDialogVisible by remember { mutableStateOf(false) }
 
     when (val uiState = homeState.coins) {
         is UiState.Loading -> {
@@ -50,13 +54,7 @@ fun HomeScreen(
         }
 
         is UiState.Error -> {
-            ErrorDialog(message = uiState.message, onDismiss = { })
-            val errorMessage = uiState.message
-            Text(
-                text = "Error: $errorMessage",
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(16.dp)
-            )
+            ErrorDialog(message = uiState.message, onDismiss = { isDialogVisible = false })
         }
     }
 }

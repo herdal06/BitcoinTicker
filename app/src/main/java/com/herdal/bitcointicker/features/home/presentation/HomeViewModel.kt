@@ -18,12 +18,12 @@ class HomeViewModel @Inject constructor(
     val homeState = _homeState.asStateFlow()
 
     init {
-        getCoins("usd")
+        getCoins()
     }
 
-    private fun getCoins(currency: String) {
+    private fun getCoins() {
         viewModelScope.launch {
-            getCoinsUseCase.execute(currency).collect { uiState ->
+            getCoinsUseCase.execute().collect { uiState ->
                 _homeState.update { currentState ->
                     currentState.copy(coins = uiState)
                 }

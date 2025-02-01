@@ -24,6 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +48,7 @@ fun MyCoinsScreen(
     onClickCoin: (String?) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var isDialogVisible by remember { mutableStateOf(false) }
 
     when (val favoriteCoinsState = state.favoriteCoins) {
         is UiState.Loading -> {
@@ -61,10 +65,7 @@ fun MyCoinsScreen(
         }
 
         is UiState.Error -> {
-            ErrorDialog(
-                message = favoriteCoinsState.message,
-                onDismiss = { }
-            )
+            ErrorDialog(message = favoriteCoinsState.message, onDismiss = { isDialogVisible = false })
         }
     }
 }

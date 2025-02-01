@@ -19,5 +19,6 @@ data class CoinDetailUiModel(
     val sentimentVotesUpPercentage: Float,
     val symbol: String?,
     val watchlistPortfolioUsers: Int?,
-    val webSlug: String?
+    val webSlug: String?,
+    val isFavorite: Boolean = false
 )

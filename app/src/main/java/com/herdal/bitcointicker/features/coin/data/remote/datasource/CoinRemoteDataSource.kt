@@ -5,6 +5,6 @@ import com.herdal.bitcointicker.features.coin.data.remote.dto.CoinDetailDto
 import com.herdal.bitcointicker.features.coin.data.remote.dto.CoinsResponse
 
 interface CoinRemoteDataSource {
-    suspend fun getCoins(currency: String): IResult<CoinsResponse>
+    suspend fun getCoins(): IResult<CoinsResponse>
     suspend fun getCoinDetail(id: String): IResult<CoinDetailDto>
 }

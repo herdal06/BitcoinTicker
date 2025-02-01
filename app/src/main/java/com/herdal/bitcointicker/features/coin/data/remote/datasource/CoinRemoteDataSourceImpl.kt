@@ -9,8 +9,8 @@ import com.herdal.bitcointicker.features.coin.data.remote.service.CoinService
 class CoinRemoteDataSourceImpl(
     private val coinService: CoinService
 ) : ApiExecutor, CoinRemoteDataSource {
-    override suspend fun getCoins(currency: String): IResult<CoinsResponse> {
-        return executeApiCall { coinService.getCoins(currency) }
+    override suspend fun getCoins(): IResult<CoinsResponse> {
+        return executeApiCall { coinService.getCoins() }
     }
 
     override suspend fun getCoinDetail(id: String): IResult<CoinDetailDto> {

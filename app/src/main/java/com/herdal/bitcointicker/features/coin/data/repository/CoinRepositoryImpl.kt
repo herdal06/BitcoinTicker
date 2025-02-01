@@ -6,6 +6,7 @@ import com.herdal.bitcointicker.features.authentication.data.firebase.datasource
 import com.herdal.bitcointicker.features.coin.data.firebase.datasource.CoinFirebaseDataSource
 import com.herdal.bitcointicker.features.coin.data.firebase.model.toDomain
 import com.herdal.bitcointicker.features.coin.data.local.datasource.CoinLocalDataSource
+import com.herdal.bitcointicker.features.coin.data.local.entity.toDomain
 import com.herdal.bitcointicker.features.coin.data.remote.datasource.CoinRemoteDataSource
 import com.herdal.bitcointicker.features.coin.data.remote.dto.toDomain
 import com.herdal.bitcointicker.features.coin.domain.CoinRepository
@@ -14,6 +15,8 @@ import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinUiModel
 import com.herdal.bitcointicker.features.coin.domain.uimodel.FavoriteCoinUiModel
 import com.herdal.bitcointicker.features.coin.domain.uimodel.toEntity
 import com.herdal.bitcointicker.features.coin.domain.uimodel.toFirebaseModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CoinRepositoryImpl @Inject constructor(
@@ -22,8 +25,8 @@ class CoinRepositoryImpl @Inject constructor(
     private val authenticationDataSource: AuthenticationDataSource,
     private val coinFirebaseDataSource: CoinFirebaseDataSource
 ) : CoinRepository {
-    override suspend fun getCoins(currency: String): IResult<List<CoinUiModel>> {
-        return when (val remoteResult = coinRemoteDataSource.getCoins(currency)) {
+    override suspend fun getCoins(): IResult<List<CoinUiModel>> {
+        return when (val remoteResult = coinRemoteDataSource.getCoins()) {
             is IResult.Success -> {
                 val coins = remoteResult.data.map { it.toDomain() }
 
@@ -96,6 +99,20 @@ class CoinRepositoryImpl @Inject constructor(
             }
 
             is IResult.Failure -> IResult.Failure(currentUserResult.error)
+        }
+    }
+
+    override fun searchCoins(query: String): Flow<IResult<List<CoinUiModel>>> {
+        return coinLocalDataSource.searchCoins(query).map { result ->
+            when (result) {
+                is IResult.Success -> {
+                    IResult.Success(result.data.map { it.toDomain() })
+                }
+
+                is IResult.Failure -> {
+                    IResult.Failure(result.error)
+                }
+            }
         }
     }
 }

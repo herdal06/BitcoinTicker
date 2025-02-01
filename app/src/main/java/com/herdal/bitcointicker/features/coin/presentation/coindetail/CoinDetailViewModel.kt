@@ -3,6 +3,11 @@ package com.herdal.bitcointicker.features.coin.presentation.coindetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.herdal.bitcointicker.core.domain.UiState
+import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinDetailUiModel
+import com.herdal.bitcointicker.features.coin.domain.uimodel.FavoriteCoinUiModel
+import com.herdal.bitcointicker.features.coin.domain.usecase.AddCoinToFavoritesUseCase
+import com.herdal.bitcointicker.features.coin.domain.usecase.DeleteCoinFromFavoritesUseCase
 import com.herdal.bitcointicker.features.coin.domain.usecase.GetCoinDetailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +19,11 @@ import javax.inject.Inject
 @HiltViewModel
 class CoinDetailViewModel @Inject constructor(
     private val getCoinDetailUseCase: GetCoinDetailUseCase,
+    private val addCoinToFavoritesUseCase: AddCoinToFavoritesUseCase,
+    private val deleteCoinFromFavoritesUseCase: DeleteCoinFromFavoritesUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
     private val _state = MutableStateFlow(CoinDetailState())
     val state = _state.asStateFlow()
 
@@ -33,4 +41,54 @@ class CoinDetailViewModel @Inject constructor(
                 }
         }
     }
+
+    fun toggleFavorite() {
+        val currentState = _state.value.coin
+        if (currentState is UiState.Success) {
+            val coin = currentState.data
+            val favoriteCoin = coin.toFavoriteCoinUiModel()
+
+            viewModelScope.launch {
+                if (coin.isFavorite) {
+                    favoriteCoin.id?.let {
+                        deleteCoinFromFavoritesUseCase.execute(it)
+                            .collect {
+                                _state.update {
+                                    it.copy(
+                                        coin = currentState.copy(
+                                            data = coin.copy(
+                                                isFavorite = false
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                    }
+                } else {
+                    addCoinToFavoritesUseCase.execute(favoriteCoin)
+                        .collect {
+                            _state.update {
+                                it.copy(
+                                    coin = currentState.copy(
+                                        data = coin.copy(
+                                            isFavorite = true
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                }
+            }
+        }
+    }
+}
+
+
+fun CoinDetailUiModel.toFavoriteCoinUiModel(): FavoriteCoinUiModel {
+    return FavoriteCoinUiModel(
+        id = this.id,
+        name = this.name,
+        symbol = this.symbol,
+        image = this.largeImage
+    )
 }

@@ -10,9 +10,9 @@ import javax.inject.Inject
 class GetCoinsUseCase @Inject constructor(
     private val coinRepository: CoinRepository
 ) : BaseUseCase<List<CoinUiModel>>() {
-    fun execute(currency: String): Flow<UiState<List<CoinUiModel>>> {
+    fun execute(): Flow<UiState<List<CoinUiModel>>> {
         return super.execute {
-            coinRepository.getCoins(currency)
+            coinRepository.getCoins()
         }
     }
 }

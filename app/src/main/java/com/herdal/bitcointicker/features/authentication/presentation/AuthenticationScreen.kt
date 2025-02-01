@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.herdal.bitcointicker.R
 import com.herdal.bitcointicker.core.domain.UiState
+import com.herdal.bitcointicker.core.ui.components.ErrorDialog
 import com.herdal.bitcointicker.core.ui.components.LoadingScreen
 import com.herdal.bitcointicker.features.authentication.presentation.components.LoginTab
 import com.herdal.bitcointicker.features.authentication.presentation.components.SignUpTab
@@ -29,7 +31,7 @@ fun AuthenticationScreen(
 ) {
     var tabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.login), stringResource(R.string.signup))
-
+    var isDialogVisible by remember { mutableStateOf(false) }
     val authState by viewModel.authState.collectAsStateWithLifecycle()
 
     Column(
@@ -65,12 +67,12 @@ fun AuthenticationScreen(
     when (val loginState = authState.loginState) {
         is UiState.Loading -> LoadingScreen()
         is UiState.Success -> loginState.data?.let { user -> onSuccess(user.email.orEmpty()) }
-        is UiState.Error ->{}
+        is UiState.Error -> ErrorDialog(message = loginState.message, onDismiss = { isDialogVisible = false })
     }
 
     when (val registerState = authState.registerState) {
         is UiState.Loading -> LoadingScreen()
         is UiState.Success -> registerState.data?.let { user -> onSuccess(user.email.orEmpty()) }
-        is UiState.Error -> {}
+        is UiState.Error -> ErrorDialog(message = registerState.message, onDismiss = { isDialogVisible = false })
     }
 }
