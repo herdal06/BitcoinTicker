@@ -7,4 +7,5 @@ interface CoinFirebaseDataSource {
     suspend fun getFavoriteCoins(userId: String): IResult<List<FavoriteCoinFirebaseModel>>
     suspend fun addCoinToFavorites(userId: String, coin: FavoriteCoinFirebaseModel): IResult<Unit>
     suspend fun deleteCoinFromFavorites(userId: String, coinId: String): IResult<Unit>
+    suspend fun isCoinFavorite(userId: String, coinId: String): IResult<Boolean>
 }

@@ -38,9 +38,8 @@ fun SetupNavGraph(
             })
         }
 
-        composable(Screen.CoinDetail.route) { backStackEntry ->
-            val args = backStackEntry.arguments?.getString("id")
-            CoinDetailScreen(id = args ?: "")
+        composable(Screen.CoinDetail.route) {
+            CoinDetailScreen()
         }
     }
 }

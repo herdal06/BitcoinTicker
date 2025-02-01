@@ -2,6 +2,7 @@ package com.herdal.bitcointicker.features.coin.presentation.coindetail.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,11 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,171 +43,244 @@ fun CoinDetailContent(
     modifier: Modifier = Modifier,
     onFavoriteClick: () -> Unit
 ) {
+    var isFavorite by remember { mutableStateOf(coin.isFavorite) }
+
+    LaunchedEffect(coin.isFavorite) {
+        isFavorite = coin.isFavorite
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // Header with Image and Basic Info
+        CoinHeader(
+            name = coin.name.orEmpty(),
+            symbol = coin.symbol.orEmpty(),
+            imageUrl = coin.largeImage
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        CoinPriceInfo(
+            price = coin.currentPriceInUsd,
+            marketCapRank = coin.marketCapRank,
+            lastUpdated = coin.lastUpdated.orEmpty()
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        coin.sentimentVotesDownPercentage?.toFloat()?.let {
+            CoinSentimentAnalysis(
+                upPercentage = coin.sentimentVotesUpPercentage,
+                downPercentage = it
+            )
+        }
+
+        FavoriteButton(
+            isFavorite = isFavorite,
+            onFavoriteClick = {
+                isFavorite = !isFavorite
+                onFavoriteClick()
+            }
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        CoinTechnicalDetails(
+            genesisDate = coin.genesisDate.orEmpty(),
+            hashingAlgorithm = coin.hashingAlgorithm.orEmpty(),
+            blockTime = coin.blockTimeInMinutes
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        coin.descriptionInEn?.let { description ->
+            CoinDescription(description = description)
+        }
+    }
+}
+
+@Composable
+private fun CoinHeader(
+    name: String,
+    symbol: String,
+    imageUrl: String?,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            modifier = Modifier
+                .size(80.dp)
+                .clip(MaterialTheme.shapes.medium),
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Text(
+                text = symbol.uppercase(),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun CoinPriceInfo(
+    price: Double?,
+    marketCapRank: Int?,
+    lastUpdated: String,
+    modifier: Modifier = Modifier
+) {
+    InfoCard(modifier = modifier) {
+        DetailRow(
+            title = "Price",
+            value = "$$price"
+        )
+        DetailRow(
+            title = "Market Cap Rank",
+            value = "#$marketCapRank"
+        )
+        DetailRow(
+            title = "Last Updated",
+            value = lastUpdated
+        )
+    }
+}
+
+@Composable
+private fun CoinSentimentAnalysis(
+    upPercentage: Float,
+    downPercentage: Float,
+    modifier: Modifier = Modifier
+) {
+    InfoCard(modifier = modifier) {
+        Text(
+            text = "Sentiment Analysis",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        LinearProgressIndicator(
+            progress = { upPercentage },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(MaterialTheme.shapes.small),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.error
+        )
+
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            AsyncImage(
-                model = coin.largeImage,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(MaterialTheme.shapes.medium),
-                contentScale = ContentScale.Crop
+            Text(
+                text = "Up: $upPercentage%",
+                color = MaterialTheme.colorScheme.primary
             )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column {
-                Text(
-                    text = coin.name.orEmpty(),
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Text(
-                    text = coin.symbol?.uppercase().orEmpty(),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Price and Market Info
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                DetailRow(
-                    title = "Price",
-                    value = "$${coin.currentPriceInUsd}"
-                )
-                DetailRow(
-                    title = "Market Cap Rank",
-                    value = "#${coin.marketCapRank}"
-                )
-                DetailRow(
-                    title = "Last Updated",
-                    value = coin.lastUpdated.orEmpty()
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Sentiment Analysis
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Sentiment Analysis",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                LinearProgressIndicator(
-                    progress = { coin.sentimentVotesUpPercentage },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(MaterialTheme.shapes.small),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.error,
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Up: ${coin.sentimentVotesUpPercentage}%",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "Down: ${coin.sentimentVotesDownPercentage}%",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        }
-        IconButton(onClick = onFavoriteClick) {
-            Icon(
-                imageVector = if (coin.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                contentDescription = "Favorite",
-                tint = if (coin.isFavorite) Color.Red else Color.Gray
+            Text(
+                text = "Down: $downPercentage%",
+                color = MaterialTheme.colorScheme.error
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
 
-        // Technical Details
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Technical Details",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+@Composable
+private fun FavoriteButton(
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onFavoriteClick,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+            contentDescription = "Favorite",
+            tint = if (isFavorite) Color.Red else Color.Gray
+        )
+    }
+}
 
-                DetailRow(
-                    title = "Genesis Date",
-                    value = coin.genesisDate.orEmpty()
-                )
-                DetailRow(
-                    title = "Hashing Algorithm",
-                    value = coin.hashingAlgorithm.orEmpty()
-                )
-                DetailRow(
-                    title = "Block Time",
-                    value = "${coin.blockTimeInMinutes} minutes"
-                )
-            }
-        }
+@Composable
+private fun CoinTechnicalDetails(
+    genesisDate: String,
+    hashingAlgorithm: String,
+    blockTime: Int?,
+    modifier: Modifier = Modifier
+) {
+    InfoCard(modifier = modifier) {
+        Text(
+            text = "Technical Details",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        DetailRow(
+            title = "Genesis Date",
+            value = genesisDate
+        )
+        DetailRow(
+            title = "Hashing Algorithm",
+            value = hashingAlgorithm
+        )
+        DetailRow(
+            title = "Block Time",
+            value = "$blockTime minutes"
+        )
+    }
+}
 
-        // Description
-        if (!coin.descriptionInEn.isNullOrEmpty()) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "About",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Text(
-                        text = coin.descriptionInEn,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                }
-            }
-        }
+@Composable
+private fun CoinDescription(
+    description: String,
+    modifier: Modifier = Modifier
+) {
+    InfoCard(modifier = modifier) {
+        Text(
+            text = "About",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+    }
+}
+
+@Composable
+private fun InfoCard(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            content = content
+        )
     }
 }
 
