@@ -18,11 +18,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinUiModel
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CoinItem(
     coin: CoinUiModel,
