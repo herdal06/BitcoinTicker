@@ -59,17 +59,9 @@ fun CoinDetailContent(
         CoinHeader(
             name = coin.name.orEmpty(),
             symbol = coin.symbol.orEmpty(),
-            imageUrl = coin.largeImage
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        FavoriteButton(
-            isFavorite = isCoinFavorite,
-            onFavoriteClick = {
-                isCoinFavorite = !isCoinFavorite
-                onFavoriteClick()
-            }
+            imageUrl = coin.largeImage,
+            isCoinFavorite = isCoinFavorite,
+            onFavoriteClick = onFavoriteClick
         )
 
         CoinPriceInfo(
@@ -108,6 +100,8 @@ private fun CoinHeader(
     name: String,
     symbol: String,
     imageUrl: String?,
+    isCoinFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -134,6 +128,18 @@ private fun CoinHeader(
                 text = symbol.uppercase(),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        IconButton(
+            onClick = onFavoriteClick,
+        ) {
+            Icon(
+                imageVector = if (isCoinFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = "Favorite",
+                tint = if (isCoinFavorite) Color.Red else Color.Gray
             )
         }
     }
@@ -200,24 +206,6 @@ private fun CoinSentimentAnalysis(
                 color = MaterialTheme.colorScheme.error
             )
         }
-    }
-}
-
-@Composable
-private fun FavoriteButton(
-    isFavorite: Boolean,
-    onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    IconButton(
-        onClick = onFavoriteClick,
-        modifier = modifier
-    ) {
-        Icon(
-            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            contentDescription = "Favorite",
-            tint = if (isFavorite) Color.Red else Color.Gray
-        )
     }
 }
 

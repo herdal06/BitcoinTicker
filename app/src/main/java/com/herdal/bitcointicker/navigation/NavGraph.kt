@@ -12,11 +12,11 @@ import com.herdal.bitcointicker.features.home.presentation.HomeScreen
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    startDestination: Screen = Screen.Home
+    startDestination: String = Screen.Authentication.route
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination.route
+        startDestination = startDestination
     ) {
         composable(Screen.Authentication.route) {
             AuthenticationScreen(onSuccess = {

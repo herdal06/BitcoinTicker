@@ -5,6 +5,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.herdal.bitcointicker.core.data.local.PreferencesManager
 import com.herdal.bitcointicker.core.di.IoDispatcher
 import com.herdal.bitcointicker.features.authentication.data.firebase.datasource.AuthenticationDataSource
 import com.herdal.bitcointicker.features.authentication.data.firebase.datasource.AuthenticationDataSourceImpl
@@ -45,11 +46,13 @@ object AuthenticationModule {
     fun provideAuthenticationRepository(
         authenticationDataSource: AuthenticationDataSource,
         userFirebaseDataSource: UserFirebaseDataSource,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        preferencesManager: PreferencesManager
     ): AuthenticationRepository {
         return AuthenticationRepositoryImpl(
             authenticationDataSource,
             userFirebaseDataSource,
+            preferencesManager,
             ioDispatcher
         )
     }

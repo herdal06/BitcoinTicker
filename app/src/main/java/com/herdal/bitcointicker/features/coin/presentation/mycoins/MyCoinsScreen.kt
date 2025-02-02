@@ -122,21 +122,21 @@ fun FavoriteCoinItem(
             AsyncImage(
                 model = coin.image,
                 contentDescription = "Coin image",
-                modifier = Modifier
+                modifier = modifier
                     .size(50.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
 
             // Coin Details
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = modifier.weight(1f)) {
                 Text(
                     text = coin.name.orEmpty(),
                     style = MaterialTheme.typography.headlineSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = modifier.height(4.dp))
                 Text(
                     text = coin.symbol.orEmpty(),
                     style = MaterialTheme.typography.bodySmall.copy(
@@ -161,9 +161,11 @@ fun FavoriteCoinItem(
 }
 
 @Composable
-private fun EmptyFavoritesContent() {
+private fun EmptyFavoritesContent(
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -172,18 +174,18 @@ private fun EmptyFavoritesContent() {
         Icon(
             imageVector = Icons.Default.Favorite,
             contentDescription = null,
-            modifier = Modifier.size(64.dp),
+            modifier = modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = modifier.height(16.dp))
 
         Text(
             text = stringResource(R.string.no_favorites),
             style = MaterialTheme.typography.titleLarge
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = modifier.height(8.dp))
 
         Text(
             text = stringResource(R.string.add_favorites_description),

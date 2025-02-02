@@ -9,5 +9,4 @@ interface AuthenticationRepository {
     suspend fun checkIfEmailExists(email: String): IResult<Boolean>
     suspend fun getCurrentUser(): IResult<FirebaseUser>
     suspend fun signOut(): IResult<Unit>
-    suspend fun isUserLoggedIn(): IResult<Boolean>
 }

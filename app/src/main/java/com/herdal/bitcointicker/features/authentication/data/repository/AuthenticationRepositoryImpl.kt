@@ -1,6 +1,7 @@
 package com.herdal.bitcointicker.features.authentication.data.repository
 
 import com.google.firebase.auth.FirebaseUser
+import com.herdal.bitcointicker.core.data.local.PreferencesManager
 import com.herdal.bitcointicker.core.data.remote.IResult
 import com.herdal.bitcointicker.core.di.IoDispatcher
 import com.herdal.bitcointicker.core.data.remote.Error
@@ -15,6 +16,7 @@ import javax.inject.Inject
 class AuthenticationRepositoryImpl @Inject constructor(
     private val authenticationDataSource: AuthenticationDataSource,
     private val userFirebaseDataSource: UserFirebaseDataSource,
+    private val preferencesManager: PreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : AuthenticationRepository {
     override suspend fun registerUser(email: String, password: String): IResult<FirebaseUser> =
@@ -26,7 +28,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
                         email = result.data.email.orEmpty(),
                         createdAt = System.currentTimeMillis()
                     )
-
+                    preferencesManager.setUserLoggedIn(true)
                     when (val saveResult = userFirebaseDataSource.saveUser(user)) {
                         is IResult.Success -> IResult.Success(result.data)
                         is IResult.Failure -> IResult.Failure(saveResult.error)
@@ -41,6 +43,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             when (val result = authenticationDataSource.loginUser(email, password)) {
                 is IResult.Success -> {
+                    preferencesManager.setUserLoggedIn(true)
                     when (val userResult = userFirebaseDataSource.getUser(result.data.uid)) {
                         is IResult.Success -> IResult.Success(result.data)
                         is IResult.Failure -> {
@@ -54,6 +57,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
                                     is IResult.Success -> {
                                         IResult.Success(result.data)
                                     }
+
                                     is IResult.Failure -> {
                                         IResult.Failure(saveResult.error)
                                     }
@@ -81,11 +85,9 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun signOut(): IResult<Unit> =
         withContext(ioDispatcher) {
-            authenticationDataSource.signOut()
-        }
-
-    override suspend fun isUserLoggedIn(): IResult<Boolean> =
-        withContext(ioDispatcher) {
-            authenticationDataSource.isUserLoggedIn()
+            when (val result = authenticationDataSource.signOut()) {
+                is IResult.Failure ->  IResult.Failure(result.error)
+                is IResult.Success -> IResult.Success(result.data)
+            }
         }
 }

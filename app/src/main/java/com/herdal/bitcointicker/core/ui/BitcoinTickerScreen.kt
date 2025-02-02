@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.herdal.bitcointicker.core.ui.components.TopAppBar
@@ -18,8 +21,10 @@ import com.herdal.bitcointicker.navigation.SetupNavGraph
 
 @Composable
 fun BitcoinTickerScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: BitcoinTickerViewModel = hiltViewModel()
 ) {
+    val startScreen by rememberSaveable { mutableStateOf(viewModel.getSetupScreen()) }
     val currentDestination by navController.currentBackStackEntryAsState()
     val shouldShowBottomBar = when (currentDestination?.destination?.route) {
         Screen.Authentication.route, Screen.CoinDetail.route -> false
@@ -32,11 +37,7 @@ fun BitcoinTickerScreen(
             .statusBarsPadding()
             .navigationBarsPadding(),
         topBar = {
-            TopAppBar(onSignOut = {
-                navController.navigate(Screen.Authentication.route) {
-                    popUpTo(Screen.Home.route) { inclusive = true }
-                }
-            })
+            TopAppBar()
         },
         bottomBar = {
             if (shouldShowBottomBar) {
@@ -45,7 +46,10 @@ fun BitcoinTickerScreen(
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            SetupNavGraph(navController = navController)
+            SetupNavGraph(
+                navController = navController,
+                startDestination = startScreen
+            )
         }
     }
 }
