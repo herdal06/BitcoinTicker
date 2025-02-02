@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.herdal.bitcointicker.core.domain.UiState
 import com.herdal.bitcointicker.core.ui.components.ErrorDialog
 import com.herdal.bitcointicker.core.ui.components.LoadingScreen
 import com.herdal.bitcointicker.features.coin.presentation.coindetail.components.CoinDetailContent
@@ -17,21 +16,20 @@ fun CoinDetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    when (val coinState = state.coin) {
-        is UiState.Loading -> {
-            LoadingScreen()
-        }
+    if (state.isLoading) {
+        LoadingScreen()
+    }
 
-        is UiState.Success -> {
-            CoinDetailContent(
-                coin = coinState.data,
-                modifier = modifier,
-                onFavoriteClick = { viewModel.toggleFavorite() }
-            )
-        }
+    if (state.errorMessage != null) {
+        ErrorDialog(message = state.errorMessage.orEmpty())
+    }
 
-        is UiState.Error -> {
-            ErrorDialog(message = coinState.message)
-        }
+    state.coinDetail?.let { coinDetail ->
+        CoinDetailContent(
+            coin = coinDetail,
+            modifier = modifier,
+            isFavorite = state.isCoinFavorite,
+            onFavoriteClick = { viewModel.toggleFavorite() }
+        )
     }
 }

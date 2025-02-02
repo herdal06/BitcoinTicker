@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -16,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.herdal.bitcointicker.R
-import com.herdal.bitcointicker.core.domain.UiState
 import com.herdal.bitcointicker.core.ui.components.ErrorDialog
 import com.herdal.bitcointicker.core.ui.components.LoadingScreen
 import com.herdal.bitcointicker.core.ui.components.SearchView
@@ -30,7 +30,10 @@ fun HomeScreen(
     onClickCoin: (id: String?) -> Unit
 ) {
     val homeState by viewModel.homeState.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getCoins()
+    }
 
     Column(
         modifier = modifier
@@ -38,47 +41,44 @@ fun HomeScreen(
             .padding(16.dp)
     ) {
         SearchView(
-            query = searchQuery,
+            query = homeState.searchQuery,
             onQueryChange = viewModel::onSearchQueryChanged,
             clearQuery = { viewModel.onSearchQueryChanged("") },
             searchHint = stringResource(R.string.search_hint),
             clearContentDescription = stringResource(R.string.clear_content_description),
-            modifier = Modifier.fillMaxWidth()
+            modifier = modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = modifier.height(8.dp))
 
-        when (val uiState = homeState.coins) {
-            is UiState.Loading -> {
+        when {
+            homeState.isLoading -> {
                 LoadingScreen()
             }
 
-            is UiState.Success -> {
-                val coins = uiState.data
-                if (homeState.noCoinsFound) {
-                    NoCoinFoundScreen()
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        itemsIndexed(
-                            items = coins,
-                            key = { index, coin ->
-                                "${coin.id ?: coin.symbol ?: ""}_$index"
-                            }
-                        ) { _, coin ->
-                            CoinItem(
-                                coin = coin,
-                                onClick = { onClickCoin(coin.id) }
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
+            homeState.errorMessage != null -> {
+                ErrorDialog(message = homeState.errorMessage.orEmpty())
             }
 
-            is UiState.Error -> {
-                ErrorDialog(message = uiState.message)
+            homeState.noCoinsFound -> {
+                NoCoinFoundScreen()
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    itemsIndexed(
+                        items = homeState.coins,
+                        key = { index, coin -> "${coin.id ?: coin.symbol ?: ""}_$index" }
+                    ) { _, coin ->
+                        CoinItem(
+                            coin = coin,
+                            onClick = { onClickCoin(coin.id) }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
             }
         }
     }

@@ -1,8 +1,10 @@
 package com.herdal.bitcointicker.features.coin.presentation.coindetail
 
-import com.herdal.bitcointicker.core.domain.UiState
 import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinDetailUiModel
 
 data class CoinDetailState(
-    val coin: UiState<CoinDetailUiModel> = UiState.Loading
+    val coinDetail: CoinDetailUiModel? = null,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val isCoinFavorite: Boolean = false
 )

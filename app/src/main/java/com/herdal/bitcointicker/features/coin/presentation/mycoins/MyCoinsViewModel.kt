@@ -27,31 +27,46 @@ class MyCoinsViewModel @Inject constructor(
     private fun getFavoriteCoins() {
         viewModelScope.launch {
             getFavoriteCoinsUseCase.execute().collect { uiState ->
-                _state.update { it.copy(favoriteCoins = uiState) }
+                _state.update {
+                    when (uiState) {
+                        UiState.Loading -> it.copy(isLoading = true)
+                        is UiState.Success -> it.copy(
+                            isLoading = false,
+                            favoriteCoins = uiState.data
+                        )
+
+                        is UiState.Error -> it.copy(
+                            isLoading = false,
+                            errorMessage = uiState.message
+                        )
+                    }
+                }
             }
         }
     }
 
     fun removeFromFavorites(coinId: String) {
         viewModelScope.launch {
-            removeFromFavoritesUseCase.execute(coinId)
-                .collect { uiState ->
-                    _state.update { state ->
-                        when (uiState) {
-                            is UiState.Success -> {
-                                val currentList =
-                                    (state.favoriteCoins as? UiState.Success)?.data.orEmpty()
-                                val updatedList = currentList.filter { it.id != coinId }
-                                state.copy(
-                                    favoriteCoins = UiState.Success(updatedList),
-                                    favoriteDeleted = uiState
-                                )
-                            }
-
-                            else -> state.copy(favoriteDeleted = uiState)
+            removeFromFavoritesUseCase.execute(coinId).collect { uiState ->
+                _state.update {
+                    when (uiState) {
+                        UiState.Loading -> it.copy(isLoading = true)
+                        is UiState.Success -> {
+                            val updatedList = it.favoriteCoins.filter { coin -> coin.id != coinId }
+                            it.copy(
+                                isLoading = false,
+                                favoriteCoins = updatedList,
+                                favoriteDeleted = true
+                            )
                         }
+
+                        is UiState.Error -> it.copy(
+                            isLoading = false,
+                            errorMessage = uiState.message
+                        )
                     }
                 }
+            }
         }
     }
 }

@@ -3,11 +3,9 @@ package com.herdal.bitcointicker.features.home.presentation.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,10 +14,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.herdal.bitcointicker.R
+import com.herdal.bitcointicker.core.util.logE
 import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinUiModel
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CoinItem(
     coin: CoinUiModel,
@@ -37,18 +41,24 @@ fun CoinItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            coin.image?.let { logE(it) }
             AsyncImage(
                 model = coin.image,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(MaterialTheme.shapes.small),
-                contentScale = ContentScale.Crop
+                contentDescription = "BNB Coin Image",
+                modifier = Modifier.size(20.dp).weight(1f),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_launcher_foreground), // Geçici bir yükleme resmi
+                error = painterResource(id = R.drawable.ic_launcher_background),
+                onError =  {
+                 logE(it.result.toString())
+                }
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
 
-            Column {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
                 Text(
                     text = coin.name.orEmpty(),
                     style = MaterialTheme.typography.headlineSmall,
@@ -61,12 +71,12 @@ fun CoinItem(
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
             Text(
                 text = "$${coin.currentPrice}",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .weight(1f)
             )
         }
     }

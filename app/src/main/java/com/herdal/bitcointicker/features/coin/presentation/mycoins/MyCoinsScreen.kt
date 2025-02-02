@@ -35,36 +35,35 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.herdal.bitcointicker.R
-import com.herdal.bitcointicker.core.domain.UiState
 import com.herdal.bitcointicker.core.ui.components.ErrorDialog
 import com.herdal.bitcointicker.core.ui.components.LoadingScreen
 import com.herdal.bitcointicker.features.coin.domain.uimodel.FavoriteCoinUiModel
 
 @Composable
 fun MyCoinsScreen(
-    modifier: Modifier = Modifier,
     viewModel: MyCoinsViewModel = hiltViewModel(),
     onClickCoin: (String?) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    when (val favoriteCoinsState = state.favoriteCoins) {
-        is UiState.Loading -> {
+    when {
+        state.isLoading -> {
             LoadingScreen()
         }
 
-        is UiState.Success -> {
-            MyCoinsContent(
-                coins = favoriteCoinsState.data,
-                onClickCoin = onClickCoin,
-                onRemoveFromFavorites = viewModel::removeFromFavorites,
-                modifier = modifier
-            )
+        state.errorMessage != null -> {
+            ErrorDialog(message = state.errorMessage.orEmpty())
         }
 
-        is UiState.Error -> {
-            ErrorDialog(
-                message = favoriteCoinsState.message
+        state.favoriteCoins.isEmpty() -> {
+            EmptyFavoritesContent()
+        }
+
+        else -> {
+            MyCoinsContent(
+                coins = state.favoriteCoins,
+                onClickCoin = onClickCoin,
+                onRemoveFromFavorites = { viewModel.removeFromFavorites(it) }
             )
         }
     }
@@ -77,26 +76,22 @@ private fun MyCoinsContent(
     onRemoveFromFavorites: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (coins.isEmpty()) {
-        EmptyFavoritesContent()
-    } else {
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(
-                items = coins,
-                key = { it.id ?: 0 }
-            ) { coin ->
-                FavoriteCoinItem(
-                    coin = coin,
-                    onClickCoin = { onClickCoin(coin.id ?: "") },
-                    onRemoveFromFavorites = { onRemoveFromFavorites(coin.id ?: "") }
-                )
-            }
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(
+            items = coins,
+            key = { it.id ?: 0 }
+        ) { coin ->
+            FavoriteCoinItem(
+                coin = coin,
+                onClickCoin = { onClickCoin(coin.id ?: "") },
+                onRemoveFromFavorites = { onRemoveFromFavorites(coin.id ?: "") }
+            )
         }
     }
 }

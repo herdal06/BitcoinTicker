@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.herdal.bitcointicker.R
-import com.herdal.bitcointicker.core.domain.UiState
 import com.herdal.bitcointicker.core.ui.components.ErrorDialog
 import com.herdal.bitcointicker.core.ui.components.LoadingScreen
 import com.herdal.bitcointicker.features.authentication.presentation.components.LoginTab
@@ -37,11 +36,24 @@ import com.herdal.bitcointicker.features.authentication.presentation.components.
 @Composable
 fun AuthenticationScreen(
     viewModel: AuthenticationViewModel = hiltViewModel(),
-    onSuccess: (String) -> Unit
+    onSuccess: () -> Unit
 ) {
     var tabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf(stringResource(R.string.login), stringResource(R.string.signup))
     val authState by viewModel.authState.collectAsStateWithLifecycle()
+
+    if (authState.isLoading) {
+        LoadingScreen()
+    }
+    if (authState.errorMessage != null) {
+        ErrorDialog(
+            message = authState.errorMessage.orEmpty()
+        )
+    }
+
+    if (authState.isUserLoggedIn || authState.isUserSignedUp) {
+        onSuccess()
+    }
 
     Column(
         modifier = Modifier
@@ -102,35 +114,13 @@ fun AuthenticationScreen(
                         viewModel.loginUser(email, password)
                     }
                 )
-
                 1 -> SignUpTab(
                     onSignUpClick = { email, password ->
                         viewModel.registerUser(email, password)
-                    }
+                    },
+                    isEmailAlreadyExists = authState.isEmailAlreadyExists
                 )
             }
-        }
-
-        when (val loginState = authState.loginState) {
-            is UiState.Loading -> LoadingScreen()
-            is UiState.Success -> loginState.data?.let { user ->
-                onSuccess(user.email.orEmpty())
-            }
-
-            is UiState.Error -> ErrorDialog(
-                message = loginState.message
-            )
-        }
-
-        when (val registerState = authState.registerState) {
-            is UiState.Loading -> LoadingScreen()
-            is UiState.Success -> registerState.data?.let { user ->
-                onSuccess(user.email.orEmpty())
-            }
-
-            is UiState.Error -> ErrorDialog(
-                message = registerState.message
-            )
         }
     }
 }

@@ -21,34 +21,52 @@ class HomeViewModel @Inject constructor(
     private val _homeState = MutableStateFlow(HomeState())
     val homeState = _homeState.asStateFlow()
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
-
     init {
         getCoins()
     }
 
-    private fun getCoins() {
+    fun getCoins() {
         viewModelScope.launch {
             getCoinsUseCase.execute().collect { uiState ->
-                _homeState.update { currentState ->
-                    currentState.copy(coins = uiState, noCoinsFound = false)
+                _homeState.update {
+                    when (uiState) {
+                        UiState.Loading -> it.copy(isLoading = true)
+                        is UiState.Success -> it.copy(
+                            isLoading = false,
+                            coins = uiState.data,
+                            noCoinsFound = uiState.data.isEmpty()
+                        )
+                        is UiState.Error -> it.copy(
+                            isLoading = false,
+                            errorMessage = uiState.message
+                        )
+                    }
                 }
             }
         }
     }
 
     fun onSearchQueryChanged(query: String) {
-        _searchQuery.value = query
+        _homeState.update { it.copy(searchQuery = query) }
 
         if (query.isEmpty()) {
             getCoins()
         } else {
             viewModelScope.launch {
                 searchCoinsUseCase.execute(query).collectLatest { uiState ->
-                    val noCoinsFound = (uiState is UiState.Success && uiState.data.isEmpty())
-                    _homeState.update { currentState ->
-                        currentState.copy(coins = uiState, noCoinsFound = noCoinsFound)
+                    _homeState.update {
+                        when (uiState) {
+                            UiState.Loading -> it.copy(isLoading = true)
+                            is UiState.Success -> it.copy(
+                                isLoading = false,
+                                coins = uiState.data,
+                                noCoinsFound = uiState.data.isEmpty()
+                            )
+                            is UiState.Error -> it.copy(
+                                isLoading = false,
+                                errorMessage = uiState.message
+                            )
+                        }
                     }
                 }
             }

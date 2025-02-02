@@ -2,6 +2,7 @@ package com.herdal.bitcointicker.features.authentication.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.herdal.bitcointicker.core.domain.UiState
 import com.herdal.bitcointicker.features.authentication.domain.usecase.CheckIfEmailExistsUseCase
 import com.herdal.bitcointicker.features.authentication.domain.usecase.LoginUserUseCase
 import com.herdal.bitcointicker.features.authentication.domain.usecase.RegisterUserUseCase
@@ -24,24 +25,77 @@ class AuthenticationViewModel @Inject constructor(
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             loginUserUseCase.execute(email, password).collect { uiState ->
-                _authState.update { currentState -> currentState.copy(loginState = uiState) }
+                _authState.update {
+                    when (uiState) {
+                        UiState.Loading -> {
+                            it.copy(isLoading = true)
+                        }
+
+                        is UiState.Success -> {
+                            it.copy(isLoading = false, isUserLoggedIn = true)
+                        }
+
+                        is UiState.Error -> {
+                            it.copy(isLoading = false, errorMessage = uiState.message)
+                        }
+                    }
+                }
             }
         }
     }
 
     fun registerUser(email: String, password: String) {
         viewModelScope.launch {
-            registerUserUseCase.execute(email, password).collect { uiState ->
-                _authState.update { currentState -> currentState.copy(registerState = uiState) }
-            }
-        }
-    }
+            checkIfEmailExistsUseCase.execute(email).collect { emailCheckState ->
+                when (emailCheckState) {
+                    UiState.Loading -> {
+                        _authState.update { it.copy(isLoading = true) }
+                    }
 
-    fun checkIfEmailExists(email: String) {
-        viewModelScope.launch {
-            checkIfEmailExistsUseCase.execute(email).collect { uiState ->
-                _authState.update { currentState ->
-                    currentState.copy(emailExistsState = uiState)
+                    is UiState.Success -> {
+                        if (emailCheckState.data) {
+                            _authState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    isEmailAlreadyExists = true,
+                                    errorMessage = it.errorMessage
+                                )
+                            }
+                        } else {
+                            registerUserUseCase.execute(email, password).collect { registerState ->
+                                _authState.update {
+                                    when (registerState) {
+                                        UiState.Loading -> {
+                                            it.copy(isLoading = true)
+                                        }
+
+                                        is UiState.Success -> {
+                                            it.copy(
+                                                isLoading = false,
+                                                isUserSignedUp = true
+                                            )
+                                        }
+
+                                        is UiState.Error -> {
+                                            it.copy(
+                                                isLoading = false,
+                                                errorMessage = registerState.message
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    is UiState.Error -> {
+                        _authState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = emailCheckState.message
+                            )
+                        }
+                    }
                 }
             }
         }

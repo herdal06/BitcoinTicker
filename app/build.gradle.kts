@@ -107,9 +107,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
-    // Glide
-    implementation("io.coil-kt:coil-compose:2.5.0")
-
-    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    implementation (libs.glide)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
 }

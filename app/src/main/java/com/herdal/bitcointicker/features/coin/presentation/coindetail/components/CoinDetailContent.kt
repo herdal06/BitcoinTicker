@@ -34,19 +34,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.herdal.bitcointicker.features.coin.domain.uimodel.CoinDetailUiModel
 
 @Composable
 fun CoinDetailContent(
     coin: CoinDetailUiModel,
     modifier: Modifier = Modifier,
+    isFavorite: Boolean,
     onFavoriteClick: () -> Unit
 ) {
-    var isFavorite by remember { mutableStateOf(coin.isFavorite) }
+    var isCoinFavorite by remember { mutableStateOf(isFavorite) }
 
-    LaunchedEffect(coin.isFavorite) {
-        isFavorite = coin.isFavorite
+    LaunchedEffect(isFavorite) {
+        isCoinFavorite = isFavorite
     }
 
     Column(
@@ -79,9 +80,9 @@ fun CoinDetailContent(
         }
 
         FavoriteButton(
-            isFavorite = isFavorite,
+            isFavorite = isCoinFavorite,
             onFavoriteClick = {
-                isFavorite = !isFavorite
+                isCoinFavorite = !isCoinFavorite
                 onFavoriteClick()
             }
         )

@@ -20,7 +20,8 @@ import com.herdal.bitcointicker.R
 @Composable
 fun SignUpTab(
     modifier: Modifier = Modifier,
-    onSignUpClick: (String, String) -> Unit
+    onSignUpClick: (String, String) -> Unit,
+    isEmailAlreadyExists: Boolean = false
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -33,6 +34,10 @@ fun SignUpTab(
             value = email,
             onValueChange = { email = it },
             label = { Text(stringResource(R.string.email)) },
+            isError = isEmailAlreadyExists,
+            supportingText = if (isEmailAlreadyExists) {
+                { Text(stringResource(R.string.email_already_exists)) }
+            } else null,
             modifier = modifier.fillMaxWidth()
         )
 
@@ -46,7 +51,8 @@ fun SignUpTab(
 
         Button(
             onClick = { onSignUpClick(email, password) },
-            modifier = modifier.fillMaxWidth()
+            modifier = modifier.fillMaxWidth(),
+            enabled = email.isNotEmpty() && password.isNotEmpty() && !isEmailAlreadyExists
         ) {
             Text(stringResource(R.string.signup))
         }

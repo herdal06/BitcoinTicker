@@ -34,55 +34,64 @@ class CoinDetailViewModel @Inject constructor(
 
     private fun getCoinDetail(id: String) {
         viewModelScope.launch {
-            getCoinDetailUseCase.execute(id)
-                .collect { uiState ->
-                    _state.update { it.copy(coin = uiState) }
+            getCoinDetailUseCase.execute(id).collect { uiState ->
+                _state.update {
+                    when (uiState) {
+                        UiState.Loading -> it.copy(isLoading = true)
+                        is UiState.Success -> it.copy(
+                            isLoading = false,
+                            coinDetail = uiState.data,
+                            isCoinFavorite = uiState.data.isFavorite
+                        )
+
+                        is UiState.Error -> it.copy(
+                            isLoading = false,
+                            errorMessage = uiState.message
+                        )
+                    }
                 }
+            }
         }
     }
 
     fun toggleFavorite() {
-        val currentState = _state.value.coin
-        if (currentState is UiState.Success) {
-            val coin = currentState.data
-            val favoriteCoin = coin.toFavoriteCoinUiModel()
+        val currentCoinDetail = _state.value.coinDetail
 
+        currentCoinDetail?.let {
             viewModelScope.launch {
-                if (coin.isFavorite) {
-                    favoriteCoin.id?.let { id ->
-                        deleteCoinFromFavoritesUseCase.execute(id)
-                            .collect { result ->
-                                when (result) {
-                                    is UiState.Loading -> {
-                                        _state.update { it.copy(coin = UiState.Loading) }
-                                    }
-                                    is UiState.Success -> {
-                                        _state.update {
-                                            it.copy(
-                                                coin = UiState.Success(
-                                                    coin.copy(isFavorite = false)
-                                                )
-                                            )
-                                        }
-                                    }
-                                    else -> UiState.Error("delete coin operation failed")
-                                }
+                if (_state.value.isCoinFavorite) {
+                    deleteCoinFromFavoritesUseCase.execute(it.id.orEmpty()).collect { uiState ->
+                        _state.update {
+                            when (uiState) {
+                                UiState.Loading -> it.copy(isLoading = false)
+                                is UiState.Success -> it.copy(
+                                    isLoading = false,
+                                    isCoinFavorite = false
+                                )
+
+                                is UiState.Error -> it.copy(
+                                    isLoading = false,
+                                    errorMessage = uiState.message
+                                )
                             }
+                        }
                     }
                 } else {
-                    addCoinToFavoritesUseCase.execute(favoriteCoin)
-                        .collect { result ->
-                            when (result) {
-                                is UiState.Success -> {
-                                    _state.update {
-                                        it.copy(
-                                            coin = UiState.Success(
-                                                coin.copy(isFavorite = true)
-                                            )
-                                        )
-                                    }
+                    addCoinToFavoritesUseCase.execute(currentCoinDetail.toFavoriteCoinUiModel())
+                        .collect { uiState ->
+                            _state.update {
+                                when (uiState) {
+                                    UiState.Loading -> it.copy(isLoading = false)
+                                    is UiState.Success -> it.copy(
+                                        isLoading = false,
+                                        isCoinFavorite = true
+                                    )
+
+                                    is UiState.Error -> it.copy(
+                                        isLoading = false,
+                                        errorMessage = uiState.message
+                                    )
                                 }
-                                else -> UiState.Error("add coin operation failed")
                             }
                         }
                 }
