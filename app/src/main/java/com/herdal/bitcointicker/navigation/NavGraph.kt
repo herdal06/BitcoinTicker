@@ -12,7 +12,7 @@ import com.herdal.bitcointicker.features.home.presentation.HomeScreen
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    startDestination: Screen = Screen.Home
+    startDestination: Screen = Screen.Authentication
 ) {
     NavHost(
         navController = navController,

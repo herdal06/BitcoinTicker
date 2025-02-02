@@ -1,32 +1,32 @@
 package com.herdal.bitcointicker.core.data.remote
 
-sealed interface Error {
-    sealed interface NetworkError : Error {
-        data class NetworkUnavailable(val message: String) : NetworkError
-        data class Timeout(val message: String) : NetworkError
-        data class HttpError(val code: Int, val message: String) : NetworkError
-        data class UnknownError(val message: String) : NetworkError
+sealed class Error(open val message: String) {
+    sealed class NetworkError(message: String) : Error(message) {
+        data class NetworkUnavailable(override val message: String) : NetworkError(message)
+        data class IOError(override val message: String) : NetworkError(message)
+        data class HttpError(val code: Int, override val message: String) : NetworkError(message)
+        data class UnknownError(override val message: String) : NetworkError(message)
     }
 
-    sealed interface AuthError : Error {
-        data class InvalidCredentials(val message: String) : AuthError
-        data class UserNotFound(val message: String) : AuthError
-        data class AccountDisabled(val message: String) : AuthError
-        data class UnknownAuthError(val message: String) : AuthError
+    sealed class AuthError(message: String) : Error(message) {
+        data class InvalidCredentials(override val message: String) : AuthError(message)
+        data class UserNotFound(override val message: String) : AuthError(message)
+        data class AccountDisabled(override val message: String) : AuthError(message)
+        data class UnknownAuthError(override val message: String) : AuthError(message)
     }
 
-    sealed interface FirestoreError : Error {
-        data class DocumentNotFound(val message: String) : FirestoreError
-        data class WriteError(val message: String) : FirestoreError
-        data class UnknownFirestoreError(val message: String) : FirestoreError
-        data class AuthError(val message: String) : FirestoreError
+    sealed class FirestoreError(message: String) : Error(message) {
+        data class DocumentNotFound(override val message: String) : FirestoreError(message)
+        data class WriteError(override val message: String) : FirestoreError(message)
+        data class UnknownFirestoreError(override val message: String) : FirestoreError(message)
+        data class AuthError(override val message: String) : FirestoreError(message)
     }
 
-    sealed interface RoomDatabaseError : Error {
-        data class DataNotFound(val message: String) : RoomDatabaseError
-        data class QueryError(val message: String) : RoomDatabaseError
-        data class UnknownRoomError(val message: String) : RoomDatabaseError
+    sealed class RoomDatabaseError(message: String) : Error(message) {
+        data class DataNotFound(override val message: String) : RoomDatabaseError(message)
+        data class QueryError(override val message: String) : RoomDatabaseError(message)
+        data class UnknownRoomError(override val message: String) : RoomDatabaseError(message)
     }
 
-    data object GeneralError : Error
+    data object GeneralError : Error("An Error Occurred")
 }

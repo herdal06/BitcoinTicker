@@ -50,5 +50,5 @@ class CoinLocalDataSourceImpl @Inject constructor(
                 )
             )
         }
-    }.flowOn(ioDispatcher) // Flow'u IO thread'de çalıştır
+    }.flowOn(ioDispatcher)
 }

@@ -13,8 +13,9 @@ open class BaseUseCase<T> @Inject constructor() {
                 is IResult.Success -> {
                     emit(UiState.Success(result.data))
                 }
+
                 is IResult.Failure -> {
-                    emit(UiState.Error(result.error.toString()))
+                    emit(UiState.Error(result.error.message))
                 }
             }
         } catch (e: Exception) {

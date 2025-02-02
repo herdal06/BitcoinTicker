@@ -53,6 +53,9 @@ class CoinDetailViewModel @Inject constructor(
                         deleteCoinFromFavoritesUseCase.execute(id)
                             .collect { result ->
                                 when (result) {
+                                    is UiState.Loading -> {
+                                        _state.update { it.copy(coin = UiState.Loading) }
+                                    }
                                     is UiState.Success -> {
                                         _state.update {
                                             it.copy(
