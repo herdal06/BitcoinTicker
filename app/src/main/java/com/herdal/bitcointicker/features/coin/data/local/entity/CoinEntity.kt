@@ -18,22 +18,23 @@ data class CoinEntity(
     val atlChangePercentage: Double?,
     val atlDate: String?,
     val circulatingSupply: Double?,
-    val currentPrice: Double?,
+    val currentPrice: String?,
     val fullyDilutedValuation: Long?,
     val high24h: Double?,
     val image: String?,
     val lastUpdated: String?,
     val low24h: Double?,
-    val marketCap: Long?,
+    val marketCap: String?,
     val marketCapChange24h: Double?,
     val marketCapChangePercentage24h: Double?,
-    val marketCapRank: Int?,
+    val marketCapRank: String?,
     val maxSupply: Double?,
     val priceChange24h: Double?,
     val priceChangePercentage24h: Double?,
     val roi: RoinEntity?,
     val totalSupply: Double?,
-    val totalVolume: Long?
+    val totalVolume: Long?,
+    val priceChangeText: String?
 )
 
 fun CoinEntity.toDomain(): CoinUiModel = CoinUiModel(
@@ -62,5 +63,6 @@ fun CoinEntity.toDomain(): CoinUiModel = CoinUiModel(
     lastUpdated = lastUpdated,
     roi = roi?.toDomain(),
     fullyDilutedValuation = fullyDilutedValuation,
-    id = coinId
+    id = coinId,
+    priceChangeText = priceChangeText
 )

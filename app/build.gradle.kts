@@ -61,7 +61,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.benchmark.common)
     implementation(libs.androidx.paging.common.android)
-    implementation (libs.compose)
+    implementation(libs.compose)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
@@ -107,8 +107,5 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
-    implementation (libs.glide)
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
-
+    implementation(libs.coil.kt.coil.compose)
 }

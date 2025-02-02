@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
@@ -30,10 +30,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import coil.compose.AsyncImage
 import com.herdal.bitcointicker.R
 import com.herdal.bitcointicker.core.ui.components.ErrorDialog
 import com.herdal.bitcointicker.core.ui.components.LoadingScreen
@@ -97,51 +98,62 @@ private fun MyCoinsContent(
 }
 
 @Composable
-private fun FavoriteCoinItem(
+fun FavoriteCoinItem(
     coin: FavoriteCoinUiModel,
-    onClickCoin: () -> Unit,
-    onRemoveFromFavorites: () -> Unit
+    onClickCoin: (String) -> Unit,
+    onRemoveFromFavorites: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClickCoin),
+            .padding(vertical = 8.dp),
         shape = MaterialTheme.shapes.medium
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable { onClickCoin(coin.id.orEmpty()) }
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Coin Image
             AsyncImage(
                 model = coin.image,
-                contentDescription = null,
+                contentDescription = "Coin image",
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(MaterialTheme.shapes.small),
+                    .size(50.dp)
+                    .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
-
+            // Coin Details
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = coin.name ?: "",
-                    style = MaterialTheme.typography.titleMedium
+                    text = coin.name.orEmpty(),
+                    style = MaterialTheme.typography.headlineSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = coin.symbol?.uppercase().orEmpty(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    text = coin.symbol.orEmpty(),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = 0.7f
+                        )
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
-            IconButton(onClick = onRemoveFromFavorites) {
+            // Remove Button
+            IconButton(onClick = { onRemoveFromFavorites(coin.id.orEmpty()) }) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
+                    contentDescription = "Remove from favorites"
                 )
             }
         }

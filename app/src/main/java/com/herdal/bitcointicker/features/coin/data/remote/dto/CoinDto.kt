@@ -57,9 +57,9 @@ fun CoinDto.toDomain(): CoinUiModel =
         name = name.orEmpty(),
         symbol = symbol.orEmpty(),
         image = image.orEmpty(),
-        currentPrice = currentPrice ?: 0.0,
-        marketCap = marketCap ?: 0L,
-        marketCapRank = marketCapRank ?: 0,
+        currentPrice = currentPrice?.let { "%.2f".format(it) } ?: "N/A",
+        marketCap = marketCap?.let { "%.2f".format(it.toDouble() / 1_000_000_000) } ?: "N/A",
+        marketCapRank = marketCapRank?.let { "#$it" } ?: "N/A",
         totalVolume = totalVolume ?: 0L,
         high24h = high24h ?: 0.0,
         low24h = low24h ?: 0.0,
@@ -78,5 +78,12 @@ fun CoinDto.toDomain(): CoinUiModel =
         atlDate = atlDate.orEmpty(),
         lastUpdated = lastUpdated.orEmpty(),
         roi = roi?.toDomain(),
-        fullyDilutedValuation = fullyDilutedValuation
+        fullyDilutedValuation = fullyDilutedValuation,
+        priceChangeText = priceChangePercentage24h?.let {
+            if (it >= 0) {
+                "+${"%.2f".format(it)}%"
+            } else {
+                "${"%.2f".format(it)}%"
+            }
+        } ?: "N/A"
     )

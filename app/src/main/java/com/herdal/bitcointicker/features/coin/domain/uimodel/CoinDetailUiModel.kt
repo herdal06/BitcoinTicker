@@ -20,5 +20,9 @@ data class CoinDetailUiModel(
     val symbol: String?,
     val watchlistPortfolioUsers: Int?,
     val webSlug: String?,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val sentimentVotesDownPercentageFormatted: Double?,
+    val sentimentVotesUpPercentageFormatted: Double?,
+    val currentPriceFormatted: String,
+    val marketCapRankFormatted: String
 )

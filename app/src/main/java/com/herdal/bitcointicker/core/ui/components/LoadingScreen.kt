@@ -14,7 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.herdal.bitcointicker.R
 
 @Composable
 fun LoadingScreen(
@@ -23,7 +27,8 @@ fun LoadingScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            .alpha(0.9f),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -31,14 +36,18 @@ fun LoadingScreen(
             verticalArrangement = Arrangement.Center
         ) {
             CircularProgressIndicator(
-                modifier = modifier.size(48.dp),
-                color = MaterialTheme.colorScheme.primary
+                modifier = modifier.size(64.dp),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 6.dp
             )
             Spacer(modifier = modifier.height(16.dp))
+
             Text(
-                text = "Loading...",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground
+                text = stringResource(R.string.loading),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
