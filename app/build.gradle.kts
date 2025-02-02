@@ -108,4 +108,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
 
     implementation(libs.coil.kt.coil.compose)
+
+    // Test
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockwebserver)
 }
