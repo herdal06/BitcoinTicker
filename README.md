@@ -7,12 +7,11 @@ BitcoinTicker is a modern cryptocurrency tracking application built with Jetpack
 ## Features
 - Real-time cryptocurrency price tracking
 - Search functionality for finding specific cryptocurrencies
-- Detailed coin information with price charts and market data
+- Detailed coin information
 - Favorite coins system for quick access
 - Offline support with local caching
 
 ## App Screenshots
-[Note: Replace placeholder image paths with your actual screenshot paths]
 
 | Auth Screen | Home | Coin Detail |
 |:-:|:-:|:-:|
